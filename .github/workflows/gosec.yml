@@ -4,11 +4,15 @@ name: "Security Scan"
 # The scheduled workflow runs every at 00:00 on Sunday UTC time.
 on:
   push:
+      branches: [ main ]
   schedule:
   - cron: '0 0 * * 0'
 
+# Declare default permissions as read only.
+permissions: read-all
+
 jobs:
-  tests:
+  gosec:
     runs-on: ubuntu-latest
     env:
       GO111MODULE: on
@@ -19,7 +23,7 @@ jobs:
         uses: securego/gosec@master
         with:
           # we let the report trigger content trigger a failure using the GitHub Security features.
-          args: '-no-fail -fmt sarif -out results.sarif ./...'
+          args: '--include G105 -no-fail -fmt sarif -out results.sarif ./...'
       - name: Upload SARIF file
         uses: github/codeql-action/upload-sarif@v2
         with:
